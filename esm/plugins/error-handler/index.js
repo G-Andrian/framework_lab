@@ -1,13 +1,16 @@
-import fp from 'fastify-plugin';
+import config from '../../config/env.js';
 
-const errorHandlerPlugin = async (fastify, options) => {
-  fastify.setErrorHandler((error, request, reply) => {
+async function errorHandler(app) {
+  app.setErrorHandler(async (error, request, reply) => {
     request.log.error(error);
-    reply.status(error.statusCode || 500).send({
-      success: false,
-      message: error.message || 'Internal Server Error'
+
+    return reply.status(500).send({
+      message:
+        config.nodeEnv === 'development'
+          ? error.message
+          : 'Internal Server Error',
     });
   });
-};
+}
 
-export default fp(errorHandlerPlugin);
+export default errorHandler;

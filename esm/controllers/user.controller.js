@@ -1,26 +1,33 @@
-import * as userRepository from '../repositories/user.repository.js';
 import { count } from '../state/request-counter.js';
-import { initPermissions } from '../services/user.service.js';
+import {
+  initPermissions,
+  getPublicUsers,
+  getUserFormatted,
+} from '../services/user.service.js';
 
 initPermissions();
 
 export const getUsers = async (request, reply) => {
   count++;
 
-  const users = await userRepository.findAll();
+  const users = await getPublicUsers();
   return { users };
 };
 
-const getUserById = async (request, reply) => {
+export const getUserById = async (request, reply) => {
   count++;
+
   const { id } = request.params;
-  const user = await userRepository.findById(id);
+  const user = await getUserFormatted(id);
+
   if (!user) {
     return reply.status(404).send({ error: 'User not found' });
   }
+
   return { user };
 };
 
 export default {
-  getUserById
+  getUsers,
+  getUserById,
 };

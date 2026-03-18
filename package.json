@@ -1,16 +1,23 @@
 {
   "name": "framework-lab",
   "version": "1.0.0",
-  "description": "Lab 3 CommonJS project",
-  "main": "app.js",
-  "type": "commonjs",
-  "engines": {
-    "node": ">=18"
+  "description": "Lab 3 ESM project",
+  "type": "module",
+  "imports": {
+    "#controllers/*": "./src/controllers/*.js",
+    "#routes/*": "./src/routes/*.js",
+    "#services/*": "./src/services/*.js",
+    "#repositories/*": "./src/repositories/*.js",
+    "#utils/*": "./src/utils/*.js",
+    "#validators/*": "./src/validators/*.js",
+    "#config/*": "./src/config/*.js",
+    "#data/*": "./src/data/*.js",
+    "#constants/*": "./src/constants/*.js"
   },
   "scripts": {
-    "start": "node app.js",
-    "dev": "node --watch app.js",
+    "start": "node src/utils/app.js",
     "predev": "npm run check",
+    "dev": "node --watch src/utils/app.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -18,6 +25,16 @@
     "check": "npm run lint && npm run format:check"
   },
   "dependencies": {
-    "ajv": "^8.18.0"
+    "ajv": "^8.18.0",
+    "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

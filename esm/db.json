@@ -1,0 +1,14 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Electronics",
+      "tax": 0.2
+    },
+    {
+      "id": 2,
+      "name": "Office",
+      "tax": 0.1
+    }
+  ]
+}

@@ -13,6 +13,11 @@ import fastifyStatic from '@fastify/static';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import apiV2Routes from './routes/api.v2.routes.js';
+import rateLimit from '@fastify/rate-limit';
+import swagger from '@fastify/swagger';
+import swaggerUI from '@fastify/swagger-ui';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -38,6 +43,20 @@ export async function buildApp() {
     dotenv: true
   });
 
+  await app.register(swagger, {
+  openapi: {
+    info: {
+      title: 'Inventory API',
+      description: 'Lab 6 API Documentation',
+      version: '1.0.0'
+    }
+  }
+});
+
+await app.register(swaggerUI, {
+  routePrefix: '/docs'
+});
+
   await app.register(helmet, {
     global: true
   });
@@ -52,6 +71,11 @@ export async function buildApp() {
   });
 
   await app.register(sensible);
+
+  await app.register(rateLimit, {
+  max: 5,
+  timeWindow: '1 minute'
+});
 
   await app.register(multipart, {
   limits: {
@@ -94,12 +118,18 @@ await app.register(fastifyStatic, {
 }));
 
   await app.register(apiRoutes, {
-    prefix: '/api'
-  });
+  prefix: '/api/v1'
+});
+
+await app.register(apiV2Routes, {
+  prefix: '/api/v2'
+});
 
   app.addHook('onClose', async instance => {
     instance.log.info('Server closed');
   });
+
+await app.ready();
 
   return app;
 }

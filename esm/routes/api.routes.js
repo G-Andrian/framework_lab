@@ -79,6 +79,11 @@ export default async function apiRoutes(fastify, options) {
   );
 
   fastify.get(
+  '/users/:id/details',
+  userController.getUserDetails
+);
+
+  fastify.get(
     '/users',
     getUsersSchema,
     userController.getUsers

@@ -6,5 +6,20 @@
     "setup": "cd cjs-challenge && npm install && cd ../esm-challenge && npm install",
     "start:cjs": "cd cjs-challenge && npm start",
     "start:esm": "cd esm-challenge && npm start"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/env": "^7.0.0",
+    "@fastify/helmet": "^13.0.2",
+    "@fastify/rate-limit": "^8.1.1",
+    "@fastify/sensible": "^6.0.4",
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^1.10.2",
+    "fastify": "^5.8.5",
+    "fastify-plugin": "^6.0.0"
+  },
+  "devDependencies": {
+    "json-server": "^1.0.0-beta.15",
+    "pino-pretty": "^13.1.3"
   }
 }

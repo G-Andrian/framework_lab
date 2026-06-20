@@ -1,5 +1,6 @@
 import * as userRepository from '../repositories/user.repository.js';
 import { increment } from '../state/request-counter.js';
+import { fetchWithRetry } from '../services/external.service.js';
 // import { initPermissions } from '../services/user.service.js';
 
 // initPermissions();
@@ -63,10 +64,49 @@ export const deleteUser = async (request, reply) => {
   };
 };
 
+export const getUserDetails = async (
+  request,
+  reply
+) => {
+  increment();
+
+  const { id } = request.params;
+
+  const user =
+    await userRepository.findById(id);
+
+  if (!user) {
+    return reply.status(404).send({
+      error: 'User not found'
+    });
+  }
+
+  try {
+    const response =
+      await fetchWithRetry(
+        'http://localhost:3001/categories'
+      );
+
+    const categories =
+      await response.json();
+
+    return {
+      user,
+      categories
+    };
+  } catch {
+    return {
+      user,
+      categories: null
+    };
+  }
+};
+
 export default {
   getUsers,
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getUserDetails
 };

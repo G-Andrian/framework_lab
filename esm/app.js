@@ -4,9 +4,17 @@ import fastifyEnv from '@fastify/env';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import sensible from '@fastify/sensible';
+import multipart from '@fastify/multipart';
 
 import apiRoutes from './routes/api.routes.js';
 import { envSchema } from './config/env.schema.js';
+
+import fastifyStatic from '@fastify/static';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function buildApp() {
   const app = Fastify({
@@ -44,6 +52,17 @@ export async function buildApp() {
   });
 
   await app.register(sensible);
+
+  await app.register(multipart, {
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
+
+await app.register(fastifyStatic, {
+  root: path.join(__dirname, 'data/images'),
+  prefix: '/images/'
+});
 
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);

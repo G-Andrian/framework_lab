@@ -21,7 +21,52 @@ const getUserById = async (request, reply) => {
   return { user };
 };
 
+export const createUser = async (request, reply) => {
+  increment();
+
+  const user = await userRepository.create(request.body);
+
+  return reply.status(201).send({ user });
+};
+
+export const updateUser = async (request, reply) => {
+  increment();
+
+  const { id } = request.params;
+
+  const user = await userRepository.update(id, request.body);
+
+  if (!user) {
+    return reply.status(404).send({
+      error: 'User not found'
+    });
+  }
+
+  return { user };
+};
+
+export const deleteUser = async (request, reply) => {
+  increment();
+
+  const { id } = request.params;
+
+  const removed = await userRepository.remove(id);
+
+  if (!removed) {
+    return reply.status(404).send({
+      error: 'User not found'
+    });
+  }
+
+  return {
+    success: true
+  };
+};
+
 export default {
   getUsers,
-  getUserById
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser
 };

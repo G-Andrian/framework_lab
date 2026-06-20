@@ -1,5 +1,6 @@
 import { buildApp } from './app.js';
 import * as userRepository from './repositories/user.repository.js';
+import { createBackup } from './utils/backup.js';
 
 let app;
 
@@ -32,6 +33,8 @@ const start = async () => {
     app = await buildApp();
 
     await userRepository.init();
+
+    await createBackup();
 
     await app.listen({
       port: app.config.PORT,

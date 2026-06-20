@@ -1,0 +1,6 @@
+id,name,role,category,image
+1,Keyboard,inventory,hardware,
+2,Mouse,inventory,hardware,
+3,Monitor,inventory,electronics,
+4,Laptop,inventory,hardware,
+5,Printer,inventory,office,

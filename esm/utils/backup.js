@@ -1,6 +1,10 @@
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import fs from 'node:fs';
+import fsp from 'node:fs/promises';
+import { pipeline } from 'node:stream/promises';
+import { createGzip } from 'node:zlib';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,41 +13,74 @@ const itemsDir = path.join(__dirname, '../data/items');
 const backupsDir = path.join(__dirname, '../data/backups');
 
 export const createBackup = async () => {
-  const timestamp = Date.now();
-
-  const currentBackupDir =
-    path.join(backupsDir, String(timestamp));
-
-  await fs.mkdir(currentBackupDir, {
+  await fsp.mkdir(backupsDir, {
     recursive: true
   });
 
-  const files = await fs.readdir(itemsDir);
+  const timestamp = Date.now();
+
+  const backupFile =
+    path.join(
+      backupsDir,
+      `${timestamp}.gz`
+    );
+
+  const files =
+    await fsp.readdir(itemsDir);
+
+  let content = '';
 
   for (const file of files) {
-    if (!file.endsWith('.json')) continue;
+    if (!file.endsWith('.json')) {
+      continue;
+    }
 
-    await fs.copyFile(
-      path.join(itemsDir, file),
-      path.join(currentBackupDir, file)
-    );
+    const data =
+      await fsp.readFile(
+        path.join(itemsDir, file),
+        'utf8'
+      );
+
+    content += data + '\n';
   }
 
-  const backups = await fs.readdir(backupsDir);
+  await fsp.writeFile(
+    path.join(backupsDir, 'temp.json'),
+    content
+  );
+
+  await pipeline(
+    fs.createReadStream(
+      path.join(backupsDir, 'temp.json')
+    ),
+    createGzip(),
+    fs.createWriteStream(
+      backupFile
+    )
+  );
+
+  await fsp.unlink(
+    path.join(backupsDir, 'temp.json')
+  );
+
+  const backups =
+    await fsp.readdir(backupsDir);
 
   const sorted = backups
-    .filter(dir => /^\d+$/.test(dir))
-    .sort((a, b) => Number(a) - Number(b));
+    .filter(file =>
+      file.endsWith('.gz')
+    )
+    .sort();
 
   while (sorted.length > 5) {
-    const oldest = sorted.shift();
+    const oldest =
+      sorted.shift();
 
-    await fs.rm(
-      path.join(backupsDir, oldest),
-      {
-        recursive: true,
-        force: true
-      }
+    await fsp.unlink(
+      path.join(
+        backupsDir,
+        oldest
+      )
     );
   }
 };

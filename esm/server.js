@@ -1,6 +1,8 @@
 import { buildApp } from './app.js';
 import * as userRepository from './repositories/user.repository.js';
 import { createBackup } from './utils/backup.js';
+import { WebSocketServer } from 'ws';
+import { itemEvents } from './events/item.events.js';
 
 let app;
 
@@ -40,6 +42,64 @@ const start = async () => {
       port: app.config.PORT,
       host: app.config.HOST
     });
+
+    const wss =
+  new WebSocketServer({
+    port: 8082
+  });
+
+wss.on(
+  'connection',
+  ws => {
+    ws.send(
+      JSON.stringify({
+        event: 'connected'
+      })
+    );
+  }
+);
+
+itemEvents.on(
+  'item-created',
+  item => {
+    wss.clients.forEach(client =>
+      client.send(
+        JSON.stringify({
+          event: 'item-created',
+          item
+        })
+      )
+    );
+  }
+);
+
+itemEvents.on(
+  'item-updated',
+  item => {
+    wss.clients.forEach(client =>
+      client.send(
+        JSON.stringify({
+          event: 'item-updated',
+          item
+        })
+      )
+    );
+  }
+);
+
+itemEvents.on(
+  'item-deleted',
+  item => {
+    wss.clients.forEach(client =>
+      client.send(
+        JSON.stringify({
+          event: 'item-deleted',
+          item
+        })
+      )
+    );
+  }
+);
 
     app.log.info(
       `Server -> http://${app.config.HOST}:${app.config.PORT}`

@@ -5,6 +5,8 @@ import { fetchWithRetry } from '../services/external.service.js';
 
 // initPermissions();
 
+import { itemEvents } from '../events/item.events.js';
+
 export const getUsers = async (request, reply) => {
   increment();
 
@@ -27,6 +29,13 @@ export const createUser = async (request, reply) => {
 
   const user = await userRepository.create(request.body);
 
+  itemEvents.emit(
+  'item-created',
+  user
+);
+
+  itemEvents.emit('userCreated', user);
+
   return reply.status(201).send({ user });
 };
 
@@ -36,6 +45,11 @@ export const updateUser = async (request, reply) => {
   const { id } = request.params;
 
   const user = await userRepository.update(id, request.body);
+
+  itemEvents.emit(
+  'item-updated',
+  user
+);
 
   if (!user) {
     return reply.status(404).send({
@@ -58,6 +72,11 @@ export const deleteUser = async (request, reply) => {
       error: 'User not found'
     });
   }
+
+  itemEvents.emit(
+  'item-deleted',
+  { id }
+);
 
   return {
     success: true
@@ -102,11 +121,33 @@ export const getUserDetails = async (
   }
 };
 
+export const streamUsers = async (
+  request,
+  reply
+) => {
+  const users =
+    await userRepository.findAll();
+
+  reply.raw.setHeader(
+    'Content-Type',
+    'application/x-ndjson'
+  );
+
+  for (const user of users) {
+    reply.raw.write(
+      JSON.stringify(user) + '\n'
+    );
+  }
+
+  reply.raw.end();
+};
+
 export default {
   getUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
-  getUserDetails
+  getUserDetails,
+  streamUsers
 };

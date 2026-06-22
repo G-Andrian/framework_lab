@@ -72,6 +72,12 @@ const userBodySchema = {
 };
 
 export default async function apiRoutes(fastify, options) {
+
+  fastify.get(
+  '/users/stream',
+  userController.streamUsers
+);
+
   fastify.get(
     '/users/:id',
     getUserByIdSchema,

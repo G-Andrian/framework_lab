@@ -6,6 +6,15 @@ import * as userRepository from '../repositories/user.repository.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+const clearItemsCache = async (fastify) => {
+  const keys =
+    await fastify.redis.keys('items:*');
+
+  if (keys.length) {
+    await fastify.redis.del(keys);
+  }
+};
+
 const getUserByIdSchema = {
   schema: {
     params: {
@@ -96,21 +105,51 @@ export default async function apiRoutes(fastify, options) {
   );
 
   fastify.post(
-    '/users',
-    userBodySchema,
-    userController.createUser
-  );
+  '/users',
+  userBodySchema,
+  async (request, reply) => {
+    const result =
+      await userController.createUser(
+        request,
+        reply
+      );
+
+    await clearItemsCache(fastify);
+
+    return result;
+  }
+);
 
   fastify.put(
-    '/users/:id',
-    userBodySchema,
-    userController.updateUser
-  );
+  '/users/:id',
+  userBodySchema,
+  async (request, reply) => {
+    const result =
+      await userController.updateUser(
+        request,
+        reply
+      );
+
+    await clearItemsCache(fastify);
+
+    return result;
+  }
+);
 
   fastify.delete(
-    '/users/:id',
-    userController.deleteUser
-  );
+  '/users/:id',
+  async (request, reply) => {
+    const result =
+      await userController.deleteUser(
+        request,
+        reply
+      );
+
+    await clearItemsCache(fastify);
+
+    return result;
+  }
+);
 
 fastify.get('/users/export', async (request, reply) => {
   const users = await userController.getUsers();

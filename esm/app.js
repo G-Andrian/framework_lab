@@ -20,6 +20,8 @@ import swaggerUI from '@fastify/swagger-ui';
 
 import mongoPlugin from './db/mongo.js';
 
+import fastifyRedis from '@fastify/redis';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -44,6 +46,15 @@ export async function buildApp() {
     schema: envSchema,
     dotenv: true
   });
+
+
+  await app.register(
+  fastifyRedis,
+  {
+    host: app.config.REDIS_HOST,
+    port: app.config.REDIS_PORT
+  }
+);
 
   await app.register(
   mongoPlugin
@@ -76,11 +87,11 @@ await app.register(swaggerUI, {
     methods: ['GET']
   });
 
-  await app.register(sensible);
-
   await app.register(rateLimit, {
+  global: true,
   max: 5,
-  timeWindow: '1 minute'
+  timeWindow: '1 minute',
+  redis: app.redis
 });
 
   await app.register(multipart, {

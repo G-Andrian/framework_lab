@@ -25,3 +25,25 @@ export const items = mysqlTable('items', {
     length: 255
   })
 });
+
+export const users = mysqlTable(
+  'users',
+  {
+    id: int('id')
+      .primaryKey()
+      .autoincrement(),
+
+    email: varchar('email', {
+      length: 255
+    })
+      .notNull()
+      .unique(),
+
+    password: varchar(
+      'password',
+      {
+        length: 255
+      }
+    ).notNull()
+  }
+);

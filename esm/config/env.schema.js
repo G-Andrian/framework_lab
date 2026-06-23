@@ -13,9 +13,13 @@ export const envSchema = {
 'MYSQL_PASSWORD',
 'MYSQL_DATABASE',
 'REDIS_HOST',
-'REDIS_PORT'
+'REDIS_PORT',
+'SESSION_SECRET'
 ],
   properties: {
+    SESSION_SECRET: {
+  type: 'string'
+},
     REDIS_HOST: {
   type: 'string'
 },

@@ -3,6 +3,7 @@ import * as userRepository from './repositories/user.repository.js';
 import { createBackup } from './utils/backup.js';
 import { WebSocketServer } from 'ws';
 import { itemEvents } from './events/item.events.js';
+import { connectMySQL } from './db/mysql.js';
 
 let app;
 
@@ -37,6 +38,10 @@ const start = async () => {
     await userRepository.init();
 
     await createBackup();
+
+    await connectMySQL(app.config);
+
+app.log.info('MySQL connected');
 
     await app.listen({
       port: app.config.PORT,

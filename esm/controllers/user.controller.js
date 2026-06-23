@@ -1,4 +1,5 @@
-import * as userRepository from '../repositories/user.repository.js';
+import * as userRepository
+from '../repositories/drizzle.repository.js';
 import { increment } from '../state/request-counter.js';
 import { fetchWithRetry } from '../services/external.service.js';
 // import { initPermissions } from '../services/user.service.js';

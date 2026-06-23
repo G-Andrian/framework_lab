@@ -11,7 +11,7 @@ const getUserByIdSchema = {
     params: {
       type: 'object',
       properties: {
-        id: { type: 'integer' }
+        id: { type: 'string' }
       },
       required: ['id']
     },
@@ -23,7 +23,7 @@ const getUserByIdSchema = {
           user: {
             type: 'object',
             properties: {
-              id: { type: 'integer' },
+              id: { type: 'string' },
               name: { type: 'string' },
               role: { type: 'string' }
             }
@@ -45,7 +45,7 @@ const getUsersSchema = {
             items: {
               type: 'object',
               properties: {
-                id: { type: 'integer' },
+                id: { type: 'string' },
                 name: { type: 'string' },
                 role: { type: 'string' }
               }

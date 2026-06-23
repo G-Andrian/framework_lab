@@ -18,6 +18,8 @@ import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 
+import mongoPlugin from './db/mongo.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -42,6 +44,10 @@ export async function buildApp() {
     schema: envSchema,
     dotenv: true
   });
+
+  await app.register(
+  mongoPlugin
+);
 
   await app.register(swagger, {
   openapi: {

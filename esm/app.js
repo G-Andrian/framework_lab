@@ -22,6 +22,11 @@ import mongoPlugin from './db/mongo.js';
 
 import fastifyRedis from '@fastify/redis';
 
+import cookie from '@fastify/cookie';
+import jwt from '@fastify/jwt';
+
+import authRoutes from './routes/auth.routes.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -55,6 +60,12 @@ export async function buildApp() {
     port: app.config.REDIS_PORT
   }
 );
+
+await app.register(cookie);
+
+await app.register(jwt, {
+  secret: app.config.JWT_SECRET
+});
 
   await app.register(
   mongoPlugin
@@ -145,6 +156,13 @@ await app.register(apiV2Routes, {
   app.addHook('onClose', async instance => {
     instance.log.info('Server closed');
   });
+
+  await app.register(
+  authRoutes,
+  {
+    prefix: '/auth'
+  }
+);
 
 await app.ready();
 

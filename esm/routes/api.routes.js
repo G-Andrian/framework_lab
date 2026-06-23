@@ -5,6 +5,7 @@ import { parse } from 'csv-parse/sync';
 import * as userRepository from '../repositories/user.repository.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { requireJwt } from '../middlewares/jwt.middleware.js';
 
 const clearItemsCache = async (fastify) => {
   const keys =
@@ -106,7 +107,10 @@ export default async function apiRoutes(fastify, options) {
 
   fastify.post(
   '/users',
-  userBodySchema,
+  {
+    ...userBodySchema,
+    onRequest: [requireJwt]
+  },
   async (request, reply) => {
     const result =
       await userController.createUser(
@@ -122,7 +126,10 @@ export default async function apiRoutes(fastify, options) {
 
   fastify.put(
   '/users/:id',
-  userBodySchema,
+  {
+    ...userBodySchema,
+    onRequest: [requireJwt]
+  },
   async (request, reply) => {
     const result =
       await userController.updateUser(
@@ -138,6 +145,9 @@ export default async function apiRoutes(fastify, options) {
 
   fastify.delete(
   '/users/:id',
+  {
+    onRequest: [requireJwt]
+  },
   async (request, reply) => {
     const result =
       await userController.deleteUser(

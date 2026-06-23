@@ -1,5 +1,5 @@
 import { db } from '../db/drizzle.js';
-import { items } from '../db/schema/items.js';
+import { items, users } from '../db/schema/items.js';
 import { eq } from 'drizzle-orm';
 
 export const findAll = async () => {
@@ -45,3 +45,27 @@ export const remove = async id => {
 
   return true;
 };
+
+export const findUserByEmail =
+  async email => {
+    const result = await db
+      .select()
+      .from(users)
+      .where(
+        eq(users.email, email)
+      );
+
+    return result[0] || null;
+  };
+
+export const createAuthUser =
+  async user => {
+    const result = await db
+      .insert(users)
+      .values(user);
+
+    return {
+      id: result[0]?.insertId,
+      email: user.email
+    };
+  };

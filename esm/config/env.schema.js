@@ -13,7 +13,8 @@ export const envSchema = {
 'MYSQL_PASSWORD',
 'MYSQL_DATABASE',
 'REDIS_HOST',
-'REDIS_PORT'
+'REDIS_PORT',
+'JWT_SECRET'
 ],
   properties: {
     REDIS_HOST: {
@@ -57,6 +58,9 @@ MONGO_DB_NAME: {
     },
     ADMIN_API_KEY: {
       type: 'string'
-    }
+    },
+    JWT_SECRET: {
+  type: 'string'
+}
   }
 };
